@@ -2,24 +2,22 @@ import numpy as np
 from vispy import app, io, scene
 import vispy
 from calc import norms, normalize, normalize_multi
-from show import show_scatter, show_mesh, assign_colors
+from show import get_scatter, get_mesh, assign_colors
 
 racial_groups = ['anyrace', 'african', 'eastasian', 'european', 'southasian']
 
 def comp_avg(sex, mcmap='blues', scmap='viridis'):
     
-    #get path to file
-    path_head = 'assets/average/'
-    path_end = '/' + sex + '/'
-
-    filename_head = 'avg_'
-    filename_end = '_' + sex
+    n = len(racial_groups)
+    # make paths to files
+    # filenames = ['avg_'+ grp + '_' + sex  for grp in racial_groups]
+    paths = ['/average/' + grp + '/'  + sex + '/' +  'avg_'+ grp + '_' + sex for grp in racial_groups]
 
     #initialize arrays 
     verts = []
     faces = []
-    for grp in racial_groups: #store vertices and faces for each face
-        path = path_head+grp+path_end+filename_head+grp+filename_end+'.obj'
+    for i in range(n): #store vertices and faces for each face
+        path = 'assets' + paths[i] + '.obj'
         vertices, facess, normals, nothing = io.read_mesh(path)
         verts.append(vertices)
         faces.append(facess)
@@ -29,10 +27,7 @@ def comp_avg(sex, mcmap='blues', scmap='viridis'):
     normalized_single = [normalize(x) for x in nrms] #normalize magnitude across self
     normalized_all = normalize_multi(nrms) #normalize magnitude across all faces
 
-    # nall_arr = np.array(normalized_single[i])
-    # nrms_arr = np.array(nrms[i])
-
-    for i in range(1, len(racial_groups)): #skip 'anyrace' as we don't care to compare it to itself
+    for i in range(1, n): #skip 'anyrace' as we don't care to compare it to itself
         #get colors
         nall_arr = np.array(normalized_single[i])
         nrms_arr = np.array(nrms[i])
@@ -45,12 +40,15 @@ def comp_avg(sex, mcmap='blues', scmap='viridis'):
         fs = faces[i]
 
         rg = racial_groups[i]
-        dest_path = 'results/average/' + rg + path_end +  filename_head + rg +'_'+sex
+        path = 'results' + paths[i]
 
-        show_scatter(vs, sc, name)
-        show_mesh(vs, fs, mc, name)
+        get_scatter(vs, sc, path)
+        get_mesh(vs, fs, mc, path)
 
-comp_avg('anysex')
+
+#comp_avg('anysex')
+comp_avg('female')
+comp_avg('male')
 
 if __name__ == '__main__':
     import sys

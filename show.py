@@ -15,21 +15,20 @@ def viewbox(canvas):
 
     return vb
 
-def show_scatter(verts, colors, name):
+def get_scatter(verts, colors, path):
     s = scene.canvas.SceneCanvas(keys='interactive', show=True)
     view = viewbox(s)
    
-
     Scatter3D = scene.visuals.create_visual_node(visuals.MarkersVisual)
     p1 = Scatter3D(parent=view.scene)
     p1.set_gl_state('translucent', blend=True, depth_test=True)
     p1.set_data(verts, symbol='o', size=5, edge_width=0.2, face_color=colors)
     
     img = s.render()
-    io.write_png('results/'+name + "_verts.png", img)
+    io.write_png(path + "_verts.png", img)
 
 
-def show_mesh(vs, fs, colors, name):
+def get_mesh(vs, fs, colors, path):
     s = scene.canvas.SceneCanvas(keys='interactive', show=True)
     view = viewbox(s)
 
@@ -39,4 +38,4 @@ def show_mesh(vs, fs, colors, name):
     view.add(mesh)
 
     img = s.render()
-    io.write_png('results/'+name + "_mesh.png",img)
+    io.write_png(path  + "_mesh.png",img)
