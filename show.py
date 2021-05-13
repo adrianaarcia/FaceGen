@@ -1,4 +1,3 @@
-import numpy as np
 from vispy import scene, visuals, color, io
 
 def assign_colors(normalized_arr, nrms_arr, cmap='husl'):      
@@ -10,7 +9,7 @@ def assign_colors(normalized_arr, nrms_arr, cmap='husl'):
 
 def viewbox(canvas):
     vb = canvas.central_widget.add_view()
-    vb.camera = scene.TurntableCamera(up='+y', distance=500)
+    vb.camera = scene.TurntableCamera(up='+y', distance=500, elevation=20, fov=40)
     vb.camera.rect = (-10, -10, 20, 20)
 
     return vb
@@ -34,6 +33,7 @@ def get_mesh(vs, fs, colors, path):
 
     mesh = scene.visuals.Mesh(vertices=vs, faces=fs, shading='smooth', vertex_colors=colors)
     mesh.set_gl_state('translucent', depth_test=True, cull_face=True)
+    mesh.ambient_light_color = color.Color('white')
 
     view.add(mesh)
 
