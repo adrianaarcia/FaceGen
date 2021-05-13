@@ -10,11 +10,10 @@ def clear_results():
             #remove previous results
             filepath = os.path.join(subdir, file)
             os.remove(filepath)
-
-clear_results()
+            
 def preprocess():
     cwd = os.getcwd()
-    dir = cwd+'/assets_original/'
+    dir = cwd+'/assets/'
 
     for subdir, dirs, files in os.walk(dir):
         for file in files:

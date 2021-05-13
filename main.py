@@ -3,15 +3,16 @@ from vispy import app, io, scene
 import vispy
 from calc import norms, normalize, normalize_multi
 from show import get_scatter, get_mesh, assign_colors
+from utils import clear_results, preprocess
 
-racial_groups = ['anyrace', 'african', 'eastasian', 'european', 'southasian']
+races = ['anyrace', 'african', 'eastasian', 'european', 'southasian']
+sexes = ['anysex', 'male', 'female']
 
-def comp_avg(sex, mcmap='blues', scmap='viridis'):
+def comp_avg(sex, mcmap='viridis', scmap='viridis'):
     
-    n = len(racial_groups)
+    n = len(races)
     # make paths to files
-    # filenames = ['avg_'+ grp + '_' + sex  for grp in racial_groups]
-    paths = ['/average/' + grp + '/'  + sex + '/' +  'avg_'+ grp + '_' + sex for grp in racial_groups]
+    paths = ['/average/' + grp + '/'  + sex + '/' +  'avg_'+ grp + '_' + sex for grp in races]
 
     #initialize arrays 
     verts = []
@@ -39,16 +40,15 @@ def comp_avg(sex, mcmap='blues', scmap='viridis'):
         vs = verts[i]
         fs = faces[i]
 
-        rg = racial_groups[i]
         path = 'results' + paths[i]
 
-        get_scatter(vs, sc, path)
+        #get_scatter(vs, sc, path)
         get_mesh(vs, fs, mc, path)
 
-
-#comp_avg('anysex')
-comp_avg('female')
-comp_avg('male')
+preprocess()
+clear_results()
+for sex in sexes:
+    comp_avg(sex)
 
 if __name__ == '__main__':
     import sys
