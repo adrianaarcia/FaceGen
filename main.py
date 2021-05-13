@@ -30,7 +30,7 @@ def comp_avg(sex, mcmap='viridis', scmap='viridis'):
 
     for i in range(1, n): #skip 'anyrace' as we don't care to compare it to itself
         #get colors
-        nall_arr = np.array(normalized_single[i])
+        nall_arr = np.array(normalized_all[i])
         nrms_arr = np.array(nrms[i])
         
         sc = assign_colors(nall_arr, nrms_arr, scmap)
