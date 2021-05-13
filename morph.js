@@ -1,6 +1,7 @@
 /* Adapted from the following sources:
  * 
  * src: https://github.com/learnthreejs/three-js-boilerplate/tree/master/public/examples/3d-obj-loader
+ * src: https://github.com/mrdoob/three.js/blob/master/examples/webgl_morphtargets.html
  * 
  */
 
@@ -16,25 +17,53 @@ const material = new THREE.MeshPhongMaterial( {
     morphTargets: true
 });
 
+var objLoader = new THREE.OBJLoader();
+objLoader.setPath('/facegen/assets/anyrace/average/');
 
+var malePositions = [];
+objLoader.load('male/avg_anyrace_male.obj', function (object) {
+    var n = 0;
+    object.traverse(function(child)
+    {
+        if (n == 0 & child instanceof THREE.Mesh)
+        {
+            malePositions = child.geometry.attributes.position.array;
+            n++;
+    }})});
 
-arv = new Float32Array(anyrace_verts.flat());
-//console.log(arv);
-const geometry = new THREE.BufferGeometry();
-//const verts = new Float32Array(verts.flat());
-//let geometry = new THREE.BufferGeometry().setFromPoints( anyrace_verts );
-//geometry.setAttribute( 'position', new THREE.BufferAttribute( arv, 3 ) );
-//const mesh = new THREE.Mesh( geometry, material );
+var group = new THREE.Object3D;
+var mesh; 
+objLoader.load('female/avg_anyrace_female.obj', function (object) {
+    var n = 0;
+    object.traverse(function(child)
+    {
+        if (n == 0 & child instanceof THREE.Mesh)
+        {
+            //add morph
+            child.geometry.morphAttributes.position = [];
+            const positionAttribute = child.geometry.attributes.position;
 
-// const geometry = new THREE.BoxGeometry( 2, 2, 2, 32, 32, 32 );
-// var mesh = new THREE.Mesh( geometry, material );
-// scene.add( mesh )
+            // add the male positions as the morph target
+			child.geometry.morphAttributes.position[ 0 ] = new THREE.Float32BufferAttribute(malePositions, 3 );
 
-// itemSize = 3 because there are 3 values (components) per vertex
-geometry.addAttribute( 'position', new THREE.BufferAttribute( arv, 3 ) );
-//const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-const mesh = new THREE.Mesh( geometry, material );
-console.log(mesh)
+            //add color
+            const count = child.geometry.attributes.position.count;
+            colors = new Array(count*3).fill(1);
+            child.geometry.addAttribute('color', new THREE.BufferAttribute(new Float32Array(colors), 3));
+            
+            //add material
+            mesh = new THREE.Mesh(child.geometry, material);
+            
+            group.add(mesh)
+            n++;
+        }
+
+    });
+});
+
+initGUI();
+scene.add(group);
+
 var animate = function () {
 	requestAnimationFrame( animate );
 	controls.update();
@@ -71,4 +100,20 @@ function initScene() {
     scene.add(keyLight);
     scene.add(fillLight);
     scene.add(backLight);
+}
+
+function initGUI() {
+
+    // Set up dat.GUI to control targets
+    const params = {
+        Male: 0,
+    };
+    const gui = new dat.GUI();
+    const folder = gui.addFolder( 'Morph Targets' );
+
+    folder.add( params, 'Male', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
+
+        mesh.morphTargetInfluences[ 0 ] = value;
+
+    } );
 }
